@@ -1,6 +1,8 @@
+import { NewsArticle } from '../../entities/news';
+
 export type RootStackParamList = {
   Tabs: undefined;
-  ArticleDetails: undefined;
+  ArticleDetails: { article: NewsArticle };
   WebView: { url: string; title?: string };
 };
 
