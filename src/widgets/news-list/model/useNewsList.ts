@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { NewsArticle, useLazyGetNewsQuery } from '../../../entities/news';
+import { NewsArticle, NewsCategory, useLazyGetNewsQuery } from '../../../entities/news';
 
 const PAGE_SIZE = 20;
+
+type NewsListFilters = {
+  query: string;
+  from?: string;
+  to?: string;
+  category?: NewsCategory;
+};
 
 type UseNewsListResult = {
   articles: NewsArticle[];
@@ -16,7 +23,7 @@ type UseNewsListResult = {
   refresh: () => void;
 };
 
-export function useNewsList(): UseNewsListResult {
+export function useNewsList(filters: NewsListFilters): UseNewsListResult {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
@@ -27,6 +34,7 @@ export function useNewsList(): UseNewsListResult {
 
   const [trigger] = useLazyGetNewsQuery();
   const requestInFlightRef = useRef(false);
+  const activeFiltersKeyRef = useRef('');
 
   const hasMore = useMemo(
     () => articles.length < totalResults || (page === 1 && articles.length === 0),
@@ -34,12 +42,17 @@ export function useNewsList(): UseNewsListResult {
   );
 
   const fetchPage = useCallback(
-    async (nextPage: number, mode: 'initial' | 'next' | 'refresh') => {
-      if (requestInFlightRef.current) {
+    async (
+      nextPage: number,
+      mode: 'initial' | 'next' | 'refresh',
+      snapshotFilters: NewsListFilters,
+    ) => {
+      if (mode === 'next' && requestInFlightRef.current) {
         return;
       }
+      const snapshotKey = JSON.stringify(snapshotFilters);
 
-      requestInFlightRef.current = true;
+      requestInFlightRef.current = mode === 'next';
       if (mode === 'initial') {
         setIsInitialLoading(true);
       } else if (mode === 'next') {
@@ -54,11 +67,18 @@ export function useNewsList(): UseNewsListResult {
           {
             page: nextPage,
             pageSize: PAGE_SIZE,
-            query: 'latest',
+            query: snapshotFilters.query,
             sortBy: 'publishedAt',
+            from: snapshotFilters.from,
+            to: snapshotFilters.to,
+            category: snapshotFilters.category,
           },
           true,
         ).unwrap();
+
+        if (snapshotKey !== activeFiltersKeyRef.current) {
+          return;
+        }
 
         setTotalResults(result.totalResults);
         setPage(nextPage);
@@ -81,24 +101,38 @@ export function useNewsList(): UseNewsListResult {
     [trigger],
   );
 
+  const filtersKey = JSON.stringify(filters);
+
   useEffect(() => {
-    void fetchPage(1, 'initial');
-  }, [fetchPage]);
+    activeFiltersKeyRef.current = filtersKey;
+    setArticles([]);
+    setPage(1);
+    setTotalResults(0);
+    void fetchPage(1, 'initial', filters);
+  }, [fetchPage, filters, filtersKey]);
 
   const loadNextPage = useCallback(() => {
     if (!hasMore || isInitialLoading || isFetchingNextPage || isRefreshing) {
       return;
     }
-    void fetchPage(page + 1, 'next');
-  }, [fetchPage, hasMore, isFetchingNextPage, isInitialLoading, isRefreshing, page]);
+    void fetchPage(page + 1, 'next', filters);
+  }, [
+    fetchPage,
+    filters,
+    hasMore,
+    isFetchingNextPage,
+    isInitialLoading,
+    isRefreshing,
+    page,
+  ]);
 
   const retry = useCallback(() => {
-    void fetchPage(1, 'initial');
-  }, [fetchPage]);
+    void fetchPage(1, 'initial', filters);
+  }, [fetchPage, filters]);
 
   const refresh = useCallback(() => {
-    void fetchPage(1, 'refresh');
-  }, [fetchPage]);
+    void fetchPage(1, 'refresh', filters);
+  }, [fetchPage, filters]);
 
   return {
     articles,

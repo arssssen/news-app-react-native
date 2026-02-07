@@ -1,6 +1,11 @@
+import { useMemo } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { NewsArticle, NewsListItem } from '../../../entities/news';
+import { useNewsFilter } from '../../../features/news-filter/model/useNewsFilter';
+import { NewsFilterBar } from '../../../features/news-filter/ui/NewsFilterBar';
+import { useNewsSearch } from '../../../features/news-search/model/useNewsSearch';
+import { NewsSearchInput } from '../../../features/news-search/ui/NewsSearchInput';
 import { RetryButton } from './RetryButton';
 import { useNewsList } from '../model/useNewsList';
 
@@ -10,6 +15,32 @@ type Props = {
 
 export function NewsListWidget({ onPressArticle }: Props) {
   const {
+    searchText,
+    debouncedSearchText,
+    onChangeSearchText,
+    clearSearch,
+  } = useNewsSearch();
+  const {
+    selectedCategory,
+    selectedDateFilter,
+    categoryParam,
+    fromParam,
+    toParam,
+    setCategory,
+    setDateFilter,
+  } = useNewsFilter();
+
+  const filters = useMemo(
+    () => ({
+      query: debouncedSearchText,
+      from: fromParam,
+      to: toParam,
+      category: categoryParam,
+    }),
+    [categoryParam, debouncedSearchText, fromParam, toParam],
+  );
+
+  const {
     articles,
     isInitialLoading,
     isFetchingNextPage,
@@ -18,7 +49,7 @@ export function NewsListWidget({ onPressArticle }: Props) {
     loadNextPage,
     retry,
     refresh,
-  } = useNewsList();
+  } = useNewsList(filters);
 
   if (isInitialLoading && articles.length === 0) {
     return (
@@ -58,6 +89,21 @@ export function NewsListWidget({ onPressArticle }: Props) {
       onEndReachedThreshold={0.5}
       refreshing={isRefreshing}
       onRefresh={refresh}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <NewsSearchInput
+            value={searchText}
+            onChangeText={onChangeSearchText}
+            onClear={clearSearch}
+          />
+          <NewsFilterBar
+            selectedCategory={selectedCategory}
+            selectedDateFilter={selectedDateFilter}
+            onSelectCategory={setCategory}
+            onSelectDateFilter={setDateFilter}
+          />
+        </View>
+      }
       ListFooterComponent={
         isFetchingNextPage ? (
           <View style={styles.footerLoader}>
@@ -80,6 +126,9 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 12,
     paddingBottom: 24,
+  },
+  header: {
+    marginBottom: 2,
   },
   message: {
     fontSize: 18,

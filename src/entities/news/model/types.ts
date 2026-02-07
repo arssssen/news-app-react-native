@@ -22,6 +22,15 @@ export type NewsApiResponse = {
   message?: string;
 };
 
+export type NewsCategory =
+  | 'business'
+  | 'entertainment'
+  | 'general'
+  | 'health'
+  | 'science'
+  | 'sports'
+  | 'technology';
+
 export type GetNewsParams = {
   page?: number;
   pageSize?: number;
@@ -30,4 +39,6 @@ export type GetNewsParams = {
   to?: string;
   sortBy?: 'relevancy' | 'popularity' | 'publishedAt';
   language?: string;
+  category?: NewsCategory;
+  country?: string;
 };

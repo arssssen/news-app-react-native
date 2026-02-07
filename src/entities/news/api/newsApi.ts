@@ -11,17 +11,34 @@ export const newsApi = baseApi.injectEndpoints({
         const {
           page = DEFAULT_PAGE,
           pageSize = DEFAULT_PAGE_SIZE,
-          query = 'latest',
+          query,
           from,
           to,
           sortBy = 'publishedAt',
           language = 'en',
+          category,
+          country = 'us',
         } = params ?? {};
+
+        const normalizedQuery = query?.trim();
+
+        if (category) {
+          return {
+            url: '/top-headlines',
+            params: {
+              category,
+              country,
+              q: normalizedQuery || undefined,
+              page,
+              pageSize,
+            },
+          };
+        }
 
         return {
           url: '/everything',
           params: {
-            q: query,
+            q: normalizedQuery || 'latest',
             page,
             pageSize,
             from,
