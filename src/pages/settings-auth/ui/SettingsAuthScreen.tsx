@@ -1,5 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FileDownloadSection } from '../../../features/file-download/ui/FileDownloadSection';
+import { FileUploadSection } from '../../../features/file-upload/ui/FileUploadSection';
 import { useNotifications } from '../../../features/push-notification/model/useNotifications';
 import { useAuth } from '../../../processes/auth/model/useAuth';
 import { ScreenContainer } from '../../../shared/ui/ScreenContainer';
@@ -47,6 +49,9 @@ export function SettingsAuthScreen() {
         <Pressable style={styles.button} onPress={logoutUser}>
           <Text style={styles.buttonLabel}>Logout</Text>
         </Pressable>
+
+        <FileUploadSection />
+        <FileDownloadSection />
       </View>
     </ScreenContainer>
   );
