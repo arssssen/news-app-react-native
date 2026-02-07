@@ -1,28 +1,38 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useCallback } from 'react';
+import { StyleSheet, View } from 'react-native';
 
-export function FavoritesScreen() {
+import { BottomTabParamList, RootStackParamList } from '../../../app/navigation/types';
+import { NewsArticle } from '../../../entities/news';
+import { ScreenContainer } from '../../../shared/ui/ScreenContainer';
+import { FavoritesListWidget } from '../../../widgets/favorites-list/ui/FavoritesListWidget';
+
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<BottomTabParamList, 'Favorites'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+export function FavoritesScreen({ navigation }: Props) {
+  const handlePressArticle = useCallback(
+    (article: NewsArticle) => {
+      navigation.navigate('ArticleDetails', { article });
+    },
+    [navigation],
+  );
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Favorites</Text>
-      <Text style={styles.subtitle}>Favorites placeholder</Text>
-    </View>
+    <ScreenContainer>
+      <View style={styles.container}>
+        <FavoritesListWidget onPressArticle={handlePressArticle} />
+      </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
   },
 });

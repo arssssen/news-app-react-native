@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import dayjs from 'dayjs';
 import {
   Image,
@@ -12,9 +13,10 @@ import { NewsArticle } from '../model/types';
 type Props = {
   article: NewsArticle;
   onPress: (article: NewsArticle) => void;
+  footerAction?: ReactNode;
 };
 
-export function NewsListItem({ article, onPress }: Props) {
+export function NewsListItem({ article, onPress, footerAction }: Props) {
   return (
     <Pressable style={styles.card} onPress={() => onPress(article)}>
       {article.urlToImage ? (
@@ -31,6 +33,7 @@ export function NewsListItem({ article, onPress }: Props) {
           {article.description ?? 'No description available.'}
         </Text>
         <Text style={styles.date}>{dayjs(article.publishedAt).format('MMM D, YYYY')}</Text>
+        {footerAction}
       </View>
     </Pressable>
   );

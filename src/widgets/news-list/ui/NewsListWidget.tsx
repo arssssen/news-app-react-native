@@ -6,12 +6,34 @@ import { useNewsFilter } from '../../../features/news-filter/model/useNewsFilter
 import { NewsFilterBar } from '../../../features/news-filter/ui/NewsFilterBar';
 import { useNewsSearch } from '../../../features/news-search/model/useNewsSearch';
 import { NewsSearchInput } from '../../../features/news-search/ui/NewsSearchInput';
+import { useFavoriteActions } from '../../../features/toggle-favorite/model/useFavoriteActions';
+import { FavoriteToggleButton } from '../../../features/toggle-favorite/ui/FavoriteToggleButton';
 import { RetryButton } from './RetryButton';
 import { useNewsList } from '../model/useNewsList';
 
 type Props = {
   onPressArticle: (article: NewsArticle) => void;
 };
+
+function NewsRow({
+  article,
+  onPressArticle,
+}: {
+  article: NewsArticle;
+  onPressArticle: (article: NewsArticle) => void;
+}) {
+  const { isFavorite, onToggleFavorite } = useFavoriteActions(article);
+
+  return (
+    <NewsListItem
+      article={article}
+      onPress={onPressArticle}
+      footerAction={
+        <FavoriteToggleButton isFavorite={isFavorite} onPress={onToggleFavorite} />
+      }
+    />
+  );
+}
 
 export function NewsListWidget({ onPressArticle }: Props) {
   const {
@@ -83,7 +105,7 @@ export function NewsListWidget({ onPressArticle }: Props) {
       keyExtractor={(item, index) => `${item.url}-${index}`}
       contentContainerStyle={styles.listContent}
       renderItem={({ item }) => (
-        <NewsListItem article={item} onPress={onPressArticle} />
+        <NewsRow article={item} onPressArticle={onPressArticle} />
       )}
       onEndReached={loadNextPage}
       onEndReachedThreshold={0.5}
