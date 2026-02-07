@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { ArticleDetailsScreen } from '../../pages/article-details/ui/ArticleDetailsScreen';
-import { WebViewScreen } from '../../pages/webview/ui/WebViewScreen';
+import { ArticleWebViewPage } from '../../pages/article-webview/ui/ArticleWebViewPage';
 import { TabsNavigator } from './TabsNavigator';
 import { RootStackParamList } from './types';
 
@@ -24,8 +24,8 @@ export function RootNavigator() {
         />
         <Stack.Screen
           name="WebView"
-          component={WebViewScreen}
-          options={{ title: 'Article' }}
+          component={ArticleWebViewPage}
+          options={({ route }) => ({ title: route.params.title ?? 'Article' })}
         />
       </Stack.Navigator>
     </NavigationContainer>
