@@ -23,3 +23,7 @@ export async function writeFavoritesToStorage(
 ): Promise<void> {
   await AsyncStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(articles));
 }
+
+export async function clearFavoritesStorage(): Promise<void> {
+  await AsyncStorage.removeItem(FAVORITES_STORAGE_KEY);
+}

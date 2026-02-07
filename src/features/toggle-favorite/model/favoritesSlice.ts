@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NewsArticle } from '../../../entities/news';
 import type { RootState } from '../../../app/store';
 import {
+  clearFavoritesStorage,
   readFavoritesFromStorage,
   writeFavoritesToStorage,
 } from './favoritesStorage';
@@ -75,6 +76,10 @@ const favoritesSlice = createSlice({
       delete state.items[id];
       state.ids = state.ids.filter((existingId) => existingId !== id);
     },
+    clearFavoritesLocal(state) {
+      state.items = {};
+      state.ids = [];
+    },
   },
 });
 
@@ -104,7 +109,20 @@ export const removeFavorite = createAsyncThunk(
   },
 );
 
-export const { setFavorites, toggleFavoriteLocal, removeFavoriteLocal } =
+export const clearFavorites = createAsyncThunk(
+  'favorites/clear',
+  async (_, { dispatch }) => {
+    dispatch(clearFavoritesLocal());
+    await clearFavoritesStorage();
+  },
+);
+
+export const {
+  setFavorites,
+  toggleFavoriteLocal,
+  removeFavoriteLocal,
+  clearFavoritesLocal,
+} =
   favoritesSlice.actions;
 
 export const favoritesReducer = favoritesSlice.reducer;
