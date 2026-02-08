@@ -13,22 +13,16 @@ type AuthStatus =
   | 'unsupported';
 
 type AuthState = {
-  isAuthenticated: boolean;
   status: AuthStatus;
   errorMessage: string | null;
   supportMessage: string | null;
 };
 
 const initialState: AuthState = {
-  isAuthenticated: false,
   status: 'idle',
   errorMessage: null,
   supportMessage: null,
 };
-
-function normalizeBoolean(value: unknown): boolean {
-  return value === true || value === 'true';
-}
 
 const AUTH_PROMPT_MESSAGE = 'Authenticate to access the app';
 
@@ -93,25 +87,21 @@ const authSlice = createSlice({
       .addCase(authenticateOnLaunch.fulfilled, (state, action) => {
         if (!action.payload.supported) {
           state.status = 'unsupported';
-          state.isAuthenticated = true;
           state.supportMessage = action.payload.reason;
           return;
         }
 
         if (action.payload.result.success) {
           state.status = 'authenticated';
-          state.isAuthenticated = true;
           state.errorMessage = null;
           return;
         }
 
         state.status = 'unauthenticated';
-        state.isAuthenticated = false;
         state.errorMessage = 'Authentication failed. Please try again.';
       })
       .addCase(authenticateOnLaunch.rejected, (state) => {
         state.status = 'unauthenticated';
-        state.isAuthenticated = false;
         state.errorMessage = 'Unable to run biometric authentication.';
       })
       .addCase(authenticateWithBiometrics.pending, (state) => {
@@ -121,30 +111,25 @@ const authSlice = createSlice({
       .addCase(authenticateWithBiometrics.fulfilled, (state, action) => {
         if (!action.payload.supported) {
           state.status = 'unsupported';
-          state.isAuthenticated = true;
           state.supportMessage = action.payload.reason;
           return;
         }
 
         if (action.payload.result.success) {
           state.status = 'authenticated';
-          state.isAuthenticated = true;
           state.errorMessage = null;
           return;
         }
 
         state.status = 'unauthenticated';
-        state.isAuthenticated = false;
         state.errorMessage = 'Authentication failed. Please try again.';
       })
       .addCase(authenticateWithBiometrics.rejected, (state) => {
         state.status = 'unauthenticated';
-        state.isAuthenticated = false;
         state.errorMessage = 'Unable to run biometric authentication.';
       })
       .addCase(logout.fulfilled, (state) => {
         state.status = 'unauthenticated';
-        state.isAuthenticated = false;
         state.errorMessage = null;
       });
   },
@@ -153,7 +138,7 @@ const authSlice = createSlice({
 export const authReducer = authSlice.reducer;
 
 export const selectIsAuthenticated = (state: RootState): boolean =>
-  normalizeBoolean(state.auth.isAuthenticated);
+  state.auth.status === 'authenticated' || state.auth.status === 'unsupported';
 export const selectAuthStatus = (state: RootState): AuthStatus => state.auth.status;
 export const selectAuthErrorMessage = (state: RootState): string | null =>
   state.auth.errorMessage;
