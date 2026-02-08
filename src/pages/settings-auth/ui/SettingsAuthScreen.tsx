@@ -20,38 +20,68 @@ export function SettingsAuthScreen() {
     <ScreenContainer>
       <View style={styles.container}>
         <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>Auth status: {status}</Text>
-        {supportMessage ? <Text style={styles.subtitle}>{supportMessage}</Text> : null}
 
-        <Text style={styles.subtitle}>
-          Notifications: {permissionGranted ? 'enabled' : 'not enabled'}
-        </Text>
-        {permissionMessage ? (
-          <Text style={styles.subtitle}>{permissionMessage}</Text>
-        ) : null}
+        <View style={styles.section}>
+          <Text style={styles.subtitle}>Auth status: {status}</Text>
+          {supportMessage ? (
+            <Text style={styles.subtitle}>{supportMessage}</Text>
+          ) : null}
+        </View>
 
-        <Pressable
-          style={styles.button}
-          onPress={initialize}
-          disabled={isNotificationsLoading}
-        >
-          <Text style={styles.buttonLabel}>Request Notification Permission</Text>
-        </Pressable>
+        <View style={styles.section}>
+          <Text style={styles.subtitle}>
+            Notifications: {permissionGranted ? 'enabled' : 'not enabled'}
+          </Text>
+          {permissionMessage ? (
+            <Text style={styles.subtitle}>{permissionMessage}</Text>
+          ) : null}
+        </View>
 
-        <Pressable
-          style={styles.button}
-          onPress={sendTestNotification}
-          disabled={isNotificationsLoading}
-        >
-          <Text style={styles.buttonLabel}>Send Test Notification</Text>
-        </Pressable>
+        <View style={styles.buttonGroup}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.button,
+              styles.buttonPrimary,
+              pressed && styles.buttonPressed,
+              isNotificationsLoading && styles.buttonDisabled,
+            ]}
+            onPress={initialize}
+            disabled={isNotificationsLoading}
+          >
+            <Text style={styles.buttonLabel}>Request Notification Permission</Text>
+          </Pressable>
 
-        <Pressable style={styles.button} onPress={logoutUser}>
-          <Text style={styles.buttonLabel}>Logout</Text>
-        </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.button,
+              styles.buttonSecondary,
+              pressed && styles.buttonPressed,
+              isNotificationsLoading && styles.buttonDisabled,
+            ]}
+            onPress={sendTestNotification}
+            disabled={isNotificationsLoading}
+          >
+            <Text style={styles.buttonLabel}>Send Test Notification</Text>
+          </Pressable>
+        </View>
 
-        <FileUploadSection />
-        <FileDownloadSection />
+        <View style={styles.section}>
+          <FileUploadSection />
+          <FileDownloadSection />
+        </View>
+
+        <View style={styles.logoutSection}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.button,
+              styles.buttonDanger,
+              pressed && styles.buttonPressed,
+            ]}
+            onPress={logoutUser}
+          >
+            <Text style={styles.buttonLabel}>Logout</Text>
+          </Pressable>
+        </View>
       </View>
     </ScreenContainer>
   );
@@ -60,26 +90,51 @@ export function SettingsAuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
     padding: 16,
+    rowGap: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
     color: '#666',
-    textAlign: 'center',
+    lineHeight: 20,
+  },
+  section: {
+    rowGap: 6,
+  },
+  buttonGroup: {
+    rowGap: 10,
+  },
+  logoutSection: {
+    marginTop: 8,
   },
   button: {
-    marginTop: 8,
     backgroundColor: '#111',
     borderRadius: 10,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  buttonPrimary: {
+    backgroundColor: '#1f5cff',
+  },
+  buttonSecondary: {
+    backgroundColor: '#1a1a1a',
+  },
+  buttonDanger: {
+    backgroundColor: '#d63b3b',
+  },
+  buttonPressed: {
+    opacity: 0.85,
+  },
+  buttonDisabled: {
+    opacity: 0.55,
   },
   buttonLabel: {
     color: '#fff',
