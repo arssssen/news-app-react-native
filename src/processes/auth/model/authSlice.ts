@@ -26,6 +26,10 @@ const initialState: AuthState = {
   supportMessage: null,
 };
 
+function normalizeBoolean(value: unknown): boolean {
+  return value === true || value === 'true';
+}
+
 const AUTH_PROMPT_MESSAGE = 'Authenticate to access the app';
 
 async function runBiometricAuth() {
@@ -149,7 +153,7 @@ const authSlice = createSlice({
 export const authReducer = authSlice.reducer;
 
 export const selectIsAuthenticated = (state: RootState): boolean =>
-  state.auth.isAuthenticated;
+  normalizeBoolean(state.auth.isAuthenticated);
 export const selectAuthStatus = (state: RootState): AuthStatus => state.auth.status;
 export const selectAuthErrorMessage = (state: RootState): string | null =>
   state.auth.errorMessage;
