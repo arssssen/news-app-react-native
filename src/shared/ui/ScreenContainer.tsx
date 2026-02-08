@@ -1,8 +1,9 @@
-import { PropsWithChildren } from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { PropsWithChildren } from 'react'
+import { StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export function ScreenContainer({ children }: PropsWithChildren) {
-  return <SafeAreaView style={styles.container}>{children}</SafeAreaView>;
+  return <SafeAreaView style={styles.container}>{children}</SafeAreaView>
 }
 
 const styles = StyleSheet.create({
@@ -10,4 +11,4 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f7f7f7',
   },
-});
+})
